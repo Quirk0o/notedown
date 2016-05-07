@@ -66,7 +66,7 @@ export default function(app) {
     }));
   }
 
-  app.set('appPath', path.join(config.root, 'client'));
+  app.set('appPath', path.join(config.root, 'dist', 'client'));
 
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'client', 'favicon.ico')));

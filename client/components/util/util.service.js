@@ -1,11 +1,11 @@
 'use strict';
 
-(function() {
+import angular from 'angular';
 
 /**
  * The Util service is for thin, globally reusable, utility functions
  */
-function UtilService($window) {
+export default function UtilService($window) {
   var Util = {
     /**
      * Return a callback or noop function
@@ -58,8 +58,3 @@ function UtilService($window) {
 
   return Util;
 }
-
-angular.module('notedownApp.util')
-  .factory('Util', UtilService);
-
-})();

@@ -1,8 +1,11 @@
 'use strict';
 
-angular.module('notedownApp')
-  .controller('OauthButtonsCtrl', function($window) {
-    this.loginOauth = function(provider) {
-      $window.location.href = '/auth/' + provider;
-    };
-  });
+export default class OauthButtonsController {
+  constructor($window) {
+    this.$window = $window;
+  }
+
+  loginOauth(provider) {
+    this.$window.location.href = '/auth/' + provider;
+  }
+}

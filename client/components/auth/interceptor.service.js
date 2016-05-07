@@ -1,8 +1,6 @@
 'use strict';
 
-(function() {
-
-function authInterceptor($rootScope, $q, $cookies, $injector, Util) {
+export default function authInterceptor($rootScope, $q, $cookies, $injector, Util) {
   var state;
   return {
     // Add authorization token to headers
@@ -25,8 +23,3 @@ function authInterceptor($rootScope, $q, $cookies, $injector, Util) {
     }
   };
 }
-
-angular.module('notedownApp.auth')
-  .factory('authInterceptor', authInterceptor);
-
-})();

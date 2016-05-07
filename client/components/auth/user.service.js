@@ -1,8 +1,6 @@
 'use strict';
 
-(function() {
-
-function UserResource($resource) {
+export default function UserResource($resource) {
   return $resource('/api/users/:id/:controller', {
     id: '@_id'
   }, {
@@ -20,8 +18,3 @@ function UserResource($resource) {
     }
   });
 }
-
-angular.module('notedownApp.auth')
-  .factory('User', UserResource);
-
-})();

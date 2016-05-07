@@ -1,8 +1,6 @@
 'use strict';
 
-(function() {
-
-function AuthService($location, $http, $cookies, $q, appConfig, Util, User) {
+export default function AuthService($location, $http, $cookies, $q, appConfig, Util, User) {
   var safeCb = Util.safeCb;
   var currentUser = {};
   var userRoles = appConfig.userRoles || [];
@@ -182,8 +180,3 @@ function AuthService($location, $http, $cookies, $q, appConfig, Util, User) {
 
   return Auth;
 }
-
-angular.module('notedownApp.auth')
-  .factory('Auth', AuthService);
-
-})();

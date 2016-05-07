@@ -1,44 +1,21 @@
 'use strict';
 
-angular.module('notedownApp')
-  .config(function($stateProvider) {
-    $stateProvider
-      .state('login', {
-        url: '/login',
-        templateUrl: 'app/account/login/login.html',
-        controller: 'LoginController',
-        controllerAs: 'vm'
-      })
-      .state('logout', {
-        url: '/logout?referrer',
-        referrer: 'main',
-        template: '',
-        controller: function($state, Auth) {
-          var referrer = $state.params.referrer ||
-                          $state.current.referrer ||
-                          'main';
-          Auth.logout();
-          $state.go(referrer);
-        }
-      })
-      .state('signup', {
-        url: '/signup',
-        templateUrl: 'app/account/signup/signup.html',
-        controller: 'SignupController',
-        controllerAs: 'vm'
-      })
-      .state('settings', {
-        url: '/settings',
-        templateUrl: 'app/account/settings/settings.html',
-        controller: 'SettingsController',
-        controllerAs: 'vm',
-        authenticate: true
-      });
-  })
-  .run(function($rootScope) {
-    $rootScope.$on('$stateChangeStart', function(event, next, nextParams, current) {
+import router from './account.routes';
+
+import LoginController from './login/login.controller';
+import SettingsController from './settings/settings.controller';
+import SignupController from './signup/signup.controller';
+
+export default angular.module('notedownApp.account', [])
+  .config(router)
+  .controller('LoginController', LoginController)
+  .controller('SettingsController', SettingsController)
+  .controller('SignupController', SignupController)
+  .run(function ($rootScope) {
+    $rootScope.$on('$stateChangeStart', function (event, next, nextParams, current) {
       if (next.name === 'logout' && current && current.name && !current.authenticate) {
         next.referrer = current.name;
       }
     });
-  });
+  })
+  .name;

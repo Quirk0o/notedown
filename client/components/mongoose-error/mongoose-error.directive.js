@@ -1,15 +1,21 @@
 'use strict';
 
+import angular from 'angular';
+
 /**
  * Removes server error when user updates input
  */
-angular.module('notedownApp')
-  .directive('mongooseError', function() {
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function(scope, element, attrs, ngModel) {
-        element.on('keydown', () => ngModel.$setValidity('mongoose', true));
-      }
-    };
-  });
+
+function mongooseError() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, ngModel) {
+      element.on('keydown', () => ngModel.$setValidity('mongoose', true));
+    }
+  };
+}
+
+export default angular.module('notedownApp.directives.mongoose-error', [])
+  .directive('mongooseError', mongooseError)
+  .name;

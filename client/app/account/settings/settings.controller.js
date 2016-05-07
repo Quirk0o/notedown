@@ -1,6 +1,6 @@
 'use strict';
 
-class SettingsController {
+export default class SettingsController {
   constructor(Auth) {
     this.errors = {};
     this.submitted = false;
@@ -24,6 +24,3 @@ class SettingsController {
     }
   }
 }
-
-angular.module('notedownApp')
-  .controller('SettingsController', SettingsController);

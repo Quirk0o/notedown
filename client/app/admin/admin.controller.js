@@ -1,8 +1,6 @@
 'use strict';
 
-(function() {
-
-class AdminController {
+export default class AdminController {
   constructor(User) {
     // Use the User $resource to fetch all users
     this.users = User.query();
@@ -13,8 +11,3 @@ class AdminController {
     this.users.splice(this.users.indexOf(user), 1);
   }
 }
-
-angular.module('notedownApp.admin')
-  .controller('AdminController', AdminController);
-
-})();

@@ -1,12 +1,11 @@
 'use strict';
 
-angular.module('notedownApp')
-  .config(function($stateProvider) {
-    $stateProvider
-      .state('main', {
-        url: '/',
-        templateUrl: 'app/main/main.html',
-        controller: 'MainController',
-        controllerAs: 'main'
-      });
-  });
+import router from './main.routes';
+import MainController from './main.controller';
+
+import './main.scss';
+
+export default angular.module('notedownApp.main', [])
+  .config(router)
+  .controller('MainController', MainController)
+  .name;

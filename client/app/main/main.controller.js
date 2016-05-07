@@ -1,12 +1,11 @@
 'use strict';
 
-(function() {
+export default class MainController {
 
-class MainController {
-
-  constructor($http, $scope, socket) {
+  constructor($http, $scope, socket, Note) {
     this.$http = $http;
     this.awesomeThings = [];
+    this.notes = Note.query();
 
     $http.get('/api/things').then(response => {
       this.awesomeThings = response.data;
@@ -29,8 +28,3 @@ class MainController {
     this.$http.delete('/api/things/' + thing._id);
   }
 }
-
-angular.module('notedownApp')
-  .controller('MainController', MainController);
-
-})();
