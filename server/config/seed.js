@@ -6,6 +6,7 @@
 'use strict';
 import Thing from '../api/thing/thing.model';
 import User from '../api/user/user.model';
+import Note from '../api/note/note.model';
 
 Thing.find({}).removeAsync()
   .then(() => {
@@ -55,5 +56,24 @@ User.find({}).removeAsync()
     })
     .then(() => {
       console.log('finished populating users');
+
+      User.findOneAsync({name: 'Test User'})
+        .then(user => {
+          Note.removeAsync()
+            .then(() => {
+              Note.createAsync({
+                  title: 'title',
+                  content: 'content',
+                  author: user._id
+                }, {
+                  title: 'title 2',
+                  content: 'more content',
+                  author: user._id
+              })
+                .then(() => {
+                  console.log('finished populating notes');
+                })
+            });
+        })
     });
   });
