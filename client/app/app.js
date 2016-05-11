@@ -6,6 +6,11 @@ import ngResource from 'angular-resource';
 import ngSanitize from 'angular-sanitize';
 import uiRouter from 'angular-ui-router';
 import uiBootstrap from 'angular-ui-bootstrap';
+import 'brace';
+import 'brace/mode/markdown';
+import 'brace/theme/chrome';
+import 'brace/ext/language_tools';
+import uiAce from 'exports?"ui.ace"!angular-ui-ace';
 import validationMatch from 'angular-validation-match';
 
 import auth from 'components/auth/auth.module';
@@ -37,6 +42,7 @@ angular.module('notedownApp', [
   socketIO,
   uiRouter,
   uiBootstrap,
+  uiAce,
   validationMatch
 ])
   .config(function($urlRouterProvider, $locationProvider) {
