@@ -7,7 +7,7 @@
   </ul>
 </div>
 
-<div ui-ace="{
+<div ng-model="main.note" ui-ace="{
   useWrapMode: true,
   showGutter: true,
   theme: 'chrome',
@@ -18,3 +18,4 @@
       enableLiveAutocompletion: true
   }
 }"></div>
+<button class="btn btn-primary btn-large" ng-click="main.submitNote(main.note)">Submit</button>
