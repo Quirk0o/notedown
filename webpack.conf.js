@@ -50,5 +50,8 @@ module.exports = {
   devtool: 'source-map',
   postcss: function () {
     return [autoprefixer];
+  },
+  externals: {
+    "mathjax": "MathJax"
   }
 };
