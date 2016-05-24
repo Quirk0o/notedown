@@ -7,15 +7,4 @@
   </ul>
 </div>
 
-<div ng-model="main.note" ui-ace="{
-  useWrapMode: true,
-  showGutter: true,
-  theme: 'chrome',
-  mode: 'markdown',
-  advanced: {
-      enableSnippets: true,
-      enableBasicAutocompletion: true,
-      enableLiveAutocompletion: true
-  }
-}"></div>
-<button class="btn btn-primary btn-large" ng-click="main.submitNote(main.note)">Submit</button>
+<Editor note="main.note" on-submit="main.submitNote(note)"></Editor>

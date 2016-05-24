@@ -1,0 +1,10 @@
+<div ng-model="$ctrl.note" ui-ace="{
+  onLoad: aceLoaded,
+  advanced: {
+    enableSnippets: true,
+    enableBasicAutocompletion: true,
+    enableLiveAutocompletion: true
+  }
+}"></div>
+
+<button class="btn btn-primary btn-large" ng-click="$ctrl.onSubmit({note: $ctrl.note})">Submit</button>

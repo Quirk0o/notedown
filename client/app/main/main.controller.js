@@ -8,6 +8,7 @@ export default class MainController {
     this.Note = Note;
     this.awesomeThings = [];
     this.notes = Note.query();
+    this.note = "";
 
     $http.get('/api/things').then(response => {
       this.awesomeThings = response.data;
@@ -31,12 +32,20 @@ export default class MainController {
   }
 
   submitNote(note) {
-    console.log('Saving note ', note);
+    let oldNotes = this.notes;
+    this.notes = oldNotes.concat([note]);
     this.Note.save({
       title: 'A Note',
       content: note,
       author: this.Auth.getCurrentUser()._id
-    });
-    this.notes = this.Note.query();
+    }).$promise
+      .then(data => {
+        this.notes = oldNotes.concat([data]);
+      })
+      .catch(error => {
+        this.notes = oldNotes;
+        console.err(error);
+      });
+    this.note = '';
   }
 }
