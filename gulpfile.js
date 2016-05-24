@@ -25,7 +25,7 @@ let webpackConf = require('./webpack.conf');
 var plugins = gulpLoadPlugins();
 var config;
 
-const clientPath = require('./bower.json').appPath || 'client';
+const clientPath = 'client';
 const serverPath = 'server';
 const paths = {
   client: {
@@ -421,8 +421,6 @@ gulp.task('constant', function () {
 gulp.task('copy:server', () => {
   return gulp.src([
       'package.json',
-      'bower.json',
-      '.bowerrc'
     ], {cwdbase: true})
     .pipe(gulp.dest(paths.dist));
 });
