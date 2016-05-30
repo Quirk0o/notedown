@@ -27,7 +27,7 @@ module.exports = {
         loader: 'html'
       },
       {
-        test: /\.png$/,
+        test: /\.(png|jpg)$/,
         loader: "file-loader"
       },
       { test: /\.woff(\?.*$|$)/,              loader: "url-loader?limit=10000&mimetype=font/woff" },
