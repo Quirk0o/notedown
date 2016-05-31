@@ -9,6 +9,6 @@ import uiAce from 'exports?"ui.ace"!angular-ui-ace';
 
 import Editor from './editor.component.js';
 
-export default angular.module('notedownApp.editor', [ uiAce ])
+export default angular.module('notedownApp.components.editor', [ uiAce ])
   .component('editor', Editor)
   .name;
