@@ -18,21 +18,14 @@ export default class MainController {
   }
 
   submitNote(note) {
+    note.author = this.Auth.getCurrentUser()._id;
+
     let oldNotes = this.notes;
     this.notes = oldNotes.concat([note]);
-    
-    this.Note.save({
-      title: 'A Note',
-      content: note,
-      author: this.Auth.getCurrentUser()._id
-    }).$promise
-      .then(data => {
-        this.notes = oldNotes.concat([data]);
-      })
-      .catch(error => {
-        this.notes = oldNotes;
-        console.err(error);
-      });
+
+    this.Note.save(note).$promise
+      .then(data => this.notes.filter((elem) => elem !== note))
+      .catch(err => this.notes = oldNotes);
     this.note = '';
   }
 }
