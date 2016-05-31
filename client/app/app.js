@@ -1,5 +1,7 @@
 'use strict';
 
+import './app.scss';
+
 import angular from 'angular';
 import ngCookies from 'angular-cookies';
 import ngResource from 'angular-resource';
@@ -20,8 +22,6 @@ import account from './account/account';
 import main from './main/main';
 
 import socketIO from 'exports?"btford.socket-io"!angular-socket-io';
-
-import './app.scss';
 
 angular.module('notedownApp', [
   auth,
