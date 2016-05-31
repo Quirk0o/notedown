@@ -25,3 +25,14 @@
 .navbar-text {
   margin-left: 15px;
 }
+
+.container-fluid, .editor {
+  padding: 0;
+}
+
+@media (max-width: 797px) {
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
