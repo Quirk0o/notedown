@@ -1,7 +1,7 @@
 'use strict';
 
 import angular from 'angular';
-import NavbarController from './navbar.controller';
+import NavbarController from './navbar.controller.js';
 
 function navbar() {
   return {
