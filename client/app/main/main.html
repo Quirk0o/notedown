@@ -1,15 +1,10 @@
-<div class="container">
-  <ul class="list-group">
-    <li class="list-group-item" ng-repeat="note in main.notes">
-      <p><strong>{{note.title}}</strong></p>
-      <p mathjax="note.content"></p>
-    </li>
-  </ul>
-</div>
-
 <div class="container-fluid">
   <div class="row-fluid">
-    <Editor class="editor col-xs-12 col-sm-12 col-md-6" note="main.note" on-submit="main.submitNote(note)"></Editor>
-    <Preview class="preview col-md-6" note="main.note"></Preview>
+    <Tree class="tree col-md-2" notes="main.notes"
+          on-select="main.handleNoteSelection(note)"
+          on-delete="main.handleNoteDelete(note)">
+    </Tree>
+    <Editor class="editor col-xs-12 col-sm-12 col-md-5" note="main.note.content" on-submit="main.submitNote(note)"></Editor>
+    <Preview class="preview col-md-5" note="main.note.content"></Preview>
   </div>
 </div>
