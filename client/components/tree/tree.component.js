@@ -11,6 +11,7 @@ export default {
     notes: '=',
     onSelect: '&',
     onChange: '&',
-    onDelete: '&'
+    onDelete: '&',
+    onCreate: '&'
   }
 };

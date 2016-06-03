@@ -6,6 +6,7 @@ export default class MainController {
     this.Note = Note;
     this.notes = [];
     this.note = { content: '', title: '', tags: [] };
+    this.notes.push(this.note);
 
     Note.query().$promise
       .then(data => {
@@ -55,5 +56,34 @@ export default class MainController {
 
     this.Note.delete({id: note._id}).$promise
       .catch(() => this.notes = oldNotes);
+  }
+
+  handleNoteCreate() {
+    if (this.note) {
+      this.note.author = this.Auth.getCurrentUser()._id;
+
+      if (this.note._id) {
+        this.Note.update({id: this.note._id}, this.note).$promise
+          .then(data => {
+            this.notes = this.notes.map(elem => {
+              if (elem._id === data._id) return data;
+              else return elem;
+            })
+          });
+      } else {
+
+        let oldNotes = this.notes;
+        this.notes = oldNotes.concat([this.note]);
+
+        this.Note.save(note).$promise
+          .then(data => {
+            this.notes = oldNotes.concat([data])
+          })
+          .catch(() => this.notes = oldNotes);
+      }
+    }
+
+    this.note = { content: '', title: '', tags: [] };
+    this.notes.push(this.note);
   }
 }
