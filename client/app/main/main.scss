@@ -36,3 +36,11 @@
     padding-right: 0;
   }
 }
+
+html, body, .container-fluid {
+  height: 95%;
+}
+
+.row-fluid, .editor, .preview, .tree {
+  height: 100%;
+}
