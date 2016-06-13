@@ -70,7 +70,8 @@ const test = _.defaults({ devtool: 'inline-source-map '}, common);
 const production = _.defaults({}, common);
 production.plugins = common.plugins.concat([
     new CopyWebpackPlugin([{ from: './client/favicon.ico' }, { from: './client/robots.txt' }]),
-    new NgAnnotateWebpackPlugin()
+    new NgAnnotateWebpackPlugin(),
+    new webpack.optimize.UglifyJsPlugin()
 ]);
 
 module.exports = { development, test, production };
