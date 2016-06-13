@@ -7,6 +7,7 @@ const tagRegex = /(?:\s|^)(?:#)(\w*[A-Za-z_]+\w*)/gi;
 export default class EditorController {
 
   constructor(marked, $sanitize) {
+    'ngInject';
     this.marked = marked;
     this.$sanitize = $sanitize;
   }

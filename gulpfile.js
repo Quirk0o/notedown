@@ -39,7 +39,7 @@ const paths = {
     styles: [`${clientPath}/{app,components}/**/*.scss`],
     mainStyle: `${clientPath}/app/app.scss`,
     views: `${clientPath}/{app,components}/**/*.html`,
-    mainView: `dist/index.html`,
+    mainView: `index.html`,
     test: [`${clientPath}/{app,components}/**/*.{spec,mock}.js`],
     e2e: ['e2e/**/*.spec.js']
   },
@@ -128,9 +128,7 @@ let lintServerTestScripts = lazypipe()
 
 let transpileServer = lazypipe()
   .pipe(plugins.sourcemaps.init)
-  .pipe(plugins.babel, {
-    optional: ['runtime']
-  })
+  .pipe(plugins.babel)
   .pipe(plugins.sourcemaps.write, '.');
 
 let mocha = lazypipe()
@@ -188,8 +186,9 @@ gulp.task('env:prod', () => {
  ********************/
 
 gulp.task('webpack', () => {
+  process.env.NODE_ENV = process.env.NODE_ENV || 'development';
   return gulp.src(paths.client.entryPoint)
-    .pipe(webpack(webpackConf))
+    .pipe(webpack(webpackConf[process.env.NODE_ENV]))
     .pipe(gulp.dest(`${paths.dist}/${clientPath}`));
 });
 
@@ -260,7 +259,7 @@ gulp.task('watch', () => {
   plugins.watch(paths.client.styles, () => {
     gulp.src(paths.client.entryPoint)
       .pipe(plugins.plumber())
-      .pipe(webpack(webpackConf))
+      .pipe(webpack(webpackConf.development))
       .pipe(gulp.dest(`${paths.dist}/${clientPath}`))
       .pipe(plugins.livereload());
   });
@@ -268,7 +267,7 @@ gulp.task('watch', () => {
   plugins.watch(paths.client.views, () => {
     gulp.src(paths.client.entryPoint)
       .pipe(plugins.plumber())
-      .pipe(webpack(webpackConf))
+      .pipe(webpack(webpackConf.development))
       .pipe(gulp.dest(`${paths.dist}/${clientPath}`))
       .pipe(plugins.livereload());
   });
@@ -280,7 +279,7 @@ gulp.task('watch', () => {
   plugins.watch(paths.client.scripts, () => {
     gulp.src(paths.client.entryPoint)
       .pipe(plugins.plumber())
-      .pipe(webpack(webpackConf))
+      .pipe(webpack(webpackConf.development))
       .pipe(gulp.dest(`${paths.dist}/${clientPath}`))
       .pipe(plugins.livereload());
   });
@@ -351,6 +350,8 @@ gulp.task('build', cb => {
     [
       'copy:server',
       'transpile:server',
+      'env:all',
+      'env:prod',
       'build:client'
     ],
     cb);
@@ -359,44 +360,7 @@ gulp.task('build', cb => {
 gulp.task('clean:dist', () => del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true}));
 gulp.task('clean:tmp', () => del(['.tmp/**/*'], {dot: true}));
 
-gulp.task('build:client', ['webpack', 'html', 'constant'], () => {
-  var manifest = gulp.src(`${paths.dist}/${clientPath}/assets/rev-manifest.json`);
-
-  var appFilter = plugins.filter('**/app.js');
-  var jsFilter = plugins.filter('**/*.js');
-  var cssFilter = plugins.filter('**/*.css');
-  var htmlBlock = plugins.filter(['**/*.!(html)']);
-
-  return gulp.src(paths.client.mainView)
-    .pipe(plugins.useref())
-    .pipe(appFilter)
-    .pipe(plugins.addSrc.append('.tmp/templates.js'))
-    .pipe(plugins.concat('app/app.js'))
-    .pipe(appFilter.restore())
-    .pipe(jsFilter)
-    .pipe(plugins.ngAnnotate())
-    .pipe(plugins.uglify())
-    .pipe(jsFilter.restore())
-    .pipe(cssFilter)
-    .pipe(plugins.minifyCss({
-      cache: true,
-      processImportFrom: ['!fonts.googleapis.com']
-    }))
-    .pipe(cssFilter.restore())
-    .pipe(htmlBlock)
-    .pipe(plugins.rev())
-    .pipe(htmlBlock.restore())
-    .pipe(plugins.revReplace({manifest}))
-    .pipe(gulp.dest(`${paths.dist}/${clientPath}`));
-});
-
-gulp.task('html', function () {
-  return gulp.src(`${clientPath}/{app,components}/**/*.html`)
-    .pipe(plugins.angularTemplatecache({
-      module: 'notedownApp'
-    }))
-    .pipe(gulp.dest('.tmp'));
-});
+gulp.task('build:client', ['webpack', 'constant'], () => {});
 
 gulp.task('constant', function () {
   let sharedConfig = require(`./${serverPath}/config/environment/shared`);

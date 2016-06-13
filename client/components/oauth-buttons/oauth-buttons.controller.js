@@ -2,6 +2,7 @@
 
 export default class OauthButtonsController {
   constructor($window) {
+    'ngInject';
     this.$window = $window;
   }
 

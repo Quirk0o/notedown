@@ -42,6 +42,7 @@ angular.module('notedownApp', [
   validationMatch
 ])
   .config(function($urlRouterProvider, $locationProvider) {
+    'ngInject';
     $urlRouterProvider
       .otherwise('/');
 

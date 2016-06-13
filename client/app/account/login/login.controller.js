@@ -2,6 +2,7 @@
 
 export default class LoginController {
   constructor(Auth, $state) {
+    'ngInject';
     this.user = {};
     this.errors = {};
     this.submitted = false;

@@ -1,6 +1,7 @@
 'use strict';
 
 export default function UserResource($resource) {
+  'ngInject';
   return $resource('/api/users/:id/:controller', {
     id: '@_id'
   }, {

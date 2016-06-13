@@ -2,6 +2,7 @@
 
 export default class AdminController {
   constructor(User) {
+    'ngInject';
     // Use the User $resource to fetch all users
     this.users = User.query();
   }

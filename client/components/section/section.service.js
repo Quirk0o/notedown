@@ -3,6 +3,7 @@
 import angular from 'angular';
 
 function SectionResource($resource) {
+  'ngInject';
   return $resource('/api/sections/:id');
 }
 

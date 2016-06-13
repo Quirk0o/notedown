@@ -2,6 +2,7 @@
 
 export default class MainController {
   constructor($scope, Auth, socket, Note) {
+    'ngInject';
     this.Auth = Auth;
     this.Note = Note;
     this.notes = [];

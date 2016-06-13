@@ -1,9 +1,15 @@
-var path = require('path');
+'use strict'
 
-var autoprefixer = require('autoprefixer');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const _ = require('lodash');
+const path = require('path');
 
-module.exports = {
+const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const NgAnnotateWebpackPlugin = require('ng-annotate-webpack-plugin');
+
+const common = {
   output: {
     filename: 'bundle.js'
   },
@@ -12,7 +18,11 @@ module.exports = {
       {
         test:   /\.js/,
         loader: 'babel',
-        exclude: /(node_modules|bower_components)/
+        exclude: /node_modules/,
+        query: {
+          "presets": ["es2015"],
+          "plugins": ["add-module-exports"]
+        }
       },
       {
         test:   /\.scss/,
@@ -39,7 +49,7 @@ module.exports = {
     root: [
       path.resolve('./client')
     ],
-    modulesDirectories: ['node_modules', 'bower_components']
+    modulesDirectories: ['node_modules']
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -47,7 +57,6 @@ module.exports = {
       inject: 'body'
     })
   ],
-  devtool: 'source-map',
   postcss: function () {
     return [autoprefixer];
   },
@@ -55,3 +64,13 @@ module.exports = {
     "mathjax": "MathJax"
   }
 };
+
+const development = _.defaults({ devtool: 'source-map '}, common);
+const test = _.defaults({ devtool: 'inline-source-map '}, common);
+const production = _.defaults({}, common);
+production.plugins = common.plugins.concat([
+    new CopyWebpackPlugin([{ from: './client/favicon.ico' }, { from: './client/robots.txt' }]),
+    new NgAnnotateWebpackPlugin()
+]);
+
+module.exports = { development, test, production };

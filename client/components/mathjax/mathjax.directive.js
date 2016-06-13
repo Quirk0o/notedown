@@ -18,6 +18,7 @@ function mathjax() {
   return {
     restrict: 'A',
     controller: function ($scope, $element) {
+      'ngInject';
       $scope.$watch(() => {
         return $element.text();
       }, () => {

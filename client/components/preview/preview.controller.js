@@ -2,6 +2,7 @@
 
 export default class PreviewController {
   constructor(marked) {
+    'ngInject';
     this.marked = marked;
   }
 

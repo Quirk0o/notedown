@@ -19,6 +19,7 @@ export default angular.module('notedownApp.auth', [
   uiRouter
 ])
   .config(function($httpProvider) {
+    'ngInject';
     $httpProvider.interceptors.push('authInterceptor');
   })
   .factory('Auth', AuthService)

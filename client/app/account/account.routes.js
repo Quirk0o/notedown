@@ -1,6 +1,7 @@
 'use strict';
 
 export default function ($stateProvider) {
+  'ngInject';
   $stateProvider
     .state('login', {
       url: '/login',
@@ -13,6 +14,7 @@ export default function ($stateProvider) {
       referrer: 'main',
       template: '',
       controller: function ($state, Auth) {
+        'ngInject';
         var referrer = $state.params.referrer ||
           $state.current.referrer ||
           'main';

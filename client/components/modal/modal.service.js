@@ -5,6 +5,7 @@ import angular from 'angular';
 import './modal.scss'
 
 export default function modal($rootScope, $modal) {
+  'ngInject';
   /**
    * Opens a modal
    * @param  {Object} scope      - an object to be merged with modal's scope

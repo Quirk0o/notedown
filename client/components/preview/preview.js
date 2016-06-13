@@ -10,6 +10,7 @@ import Preview from './preview.component.js';
 export default angular.module('notedownApp.components.preview', [ marked ])
   .component('preview', Preview)
   .config(function (markedProvider) {
+    'ngInject';
     markedProvider.setOptions({
       gfm: true,
       tables: true,

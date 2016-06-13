@@ -2,6 +2,7 @@
 
 export default class SettingsController {
   constructor(Auth) {
+    'ngInject';
     this.errors = {};
     this.submitted = false;
 

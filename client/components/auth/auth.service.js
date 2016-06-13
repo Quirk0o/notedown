@@ -1,6 +1,7 @@
 'use strict';
 
 export default function AuthService($location, $http, $cookies, $q, appConfig, Util, User) {
+  'ngInject';
   var safeCb = Util.safeCb;
   var currentUser = {};
   var userRoles = appConfig.userRoles || [];
