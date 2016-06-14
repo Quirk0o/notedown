@@ -5,9 +5,10 @@ export function setup(User, config) {
   passport.use(new GoogleStrategy({
     clientID: config.google.clientID,
     clientSecret: config.google.clientSecret,
-    callbackURL: config.google.callbackURL
+    callbackURL: config.google.callbackURL,
+    passReqToCallback: true
   },
-  function(accessToken, refreshToken, profile, done) {
+  function(req, accessToken, refreshToken, profile, done) {
     User.findOneAsync({
       'google.id': profile.id
     })
@@ -27,6 +28,8 @@ export function setup(User, config) {
         user.saveAsync()
           .then(user => done(null, user))
           .catch(err => done(err));
+
+        req.session.accessToken = accessToken;
       })
       .catch(err => done(err));
   }));
