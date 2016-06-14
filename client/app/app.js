@@ -11,6 +11,7 @@ import uiBootstrap from 'angular-ui-bootstrap';
 import validationMatch from 'angular-validation-match';
 
 import auth from 'components/auth/auth.module';
+import drive from 'components/drive/drive.service'
 import constants from './app.constant';
 import components from 'components/components.module';
 import directives from 'components/directives.module';
@@ -24,27 +25,28 @@ import main from './main/main';
 import socketIO from 'exports?"btford.socket-io"!angular-socket-io';
 
 angular.module('notedownApp', [
-  auth,
-  note,
-  admin,
-  account,
-  main,
-  constants,
-  components,
-  directives,
-  services,
-  ngCookies,
-  ngResource,
-  ngSanitize,
-  socketIO,
-  uiRouter,
-  uiBootstrap,
-  validationMatch
-])
-  .config(function($urlRouterProvider, $locationProvider) {
-    'ngInject';
-    $urlRouterProvider
-      .otherwise('/');
+      auth,
+      drive,
+      note,
+      admin,
+      account,
+      main,
+      constants,
+      components,
+      directives,
+      services,
+      ngCookies,
+      ngResource,
+      ngSanitize,
+      socketIO,
+      uiRouter,
+      uiBootstrap,
+      validationMatch
+    ])
+    .config(function ($urlRouterProvider, $locationProvider) {
+      'ngInject';
+      $urlRouterProvider
+          .otherwise('/');
 
-    $locationProvider.html5Mode(true);
-  });
+      $locationProvider.html5Mode(true);
+    });

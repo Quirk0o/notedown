@@ -1,10 +1,11 @@
 'use strict';
 
 export default class MainController {
-  constructor($scope, Auth, socket, Note) {
+  constructor($scope, Auth, socket, Note, Drive) {
     'ngInject';
     this.Auth = Auth;
     this.Note = Note;
+    this.Drive = Drive;
     this.notes = [];
     this.note = { content: '', title: '', tags: [] };
     this.notes.push(this.note);
@@ -43,6 +44,8 @@ export default class MainController {
           this.notes = oldNotes.concat([data])
         })
         .catch(() => this.notes = oldNotes);
+      
+      this.Drive.save(note);
     }
   }
 
