@@ -12,7 +12,7 @@ router
       scope:           [
         'profile',
         'email',
-        'drive.appfolder'
+        'https://www.googleapis.com/auth/drive.appfolder'
       ],
       session:         false
     }))
