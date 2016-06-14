@@ -28,8 +28,10 @@ function localAuthenticate(User, email, password, done) {
 export function setup(User, config) {
   passport.use(new LocalStrategy({
     usernameField: 'email',
-    passwordField: 'password' // this is the virtual field on the model
-  }, function(email, password, done) {
+    passwordField: 'password', // this is the virtual field on the model,
+    passReqToCallback: true
+  }, function(req, email, password, done) {
+    req.session.accessToken = 'bob';
     return localAuthenticate(User, email, password, done);
   }));
 }

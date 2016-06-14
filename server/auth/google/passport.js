@@ -9,6 +9,8 @@ export function setup(User, config) {
         passReqToCallback: true
       },
       function (req, accessToken, refreshToken, profile, done) {
+        req.session.accessToken = accessToken;
+        
         User.findOneAsync({
               'google.id': profile.id
             })
@@ -28,8 +30,6 @@ export function setup(User, config) {
               user.saveAsync()
                   .then(user => done(null, user))
                   .catch(err => done(err));
-
-              req.session.accessToken = accessToken;
             })
             .catch(err => done(err));
       }));
