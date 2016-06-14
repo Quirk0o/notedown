@@ -22,7 +22,7 @@ export function upload(req, res) {
     }
   }, (err, response) => {
     if (err) {
-      let statusCode = response.status || 500;
+      let statusCode = 500;
       res.status(statusCode).send(err);
     } else {
       let statusCode = response.status || 200;
