@@ -1,3 +1,20 @@
 .fa-arrows-v {
   margin-right: 0.5em;
 }
+
+.add {
+  font-weight: bold;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.2;
+}
+
+button.add {
+  padding: 0.35em 0 0;
+  margin-left: 0.3em;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
