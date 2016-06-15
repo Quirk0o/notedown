@@ -8,7 +8,7 @@ export default {
   template: require('./tree.html'),
   controller: TreeController,
   bindings: {
-    notes: '=',
+    notes: '<',
     onSelect: '&',
     onChange: '&',
     onDelete: '&',

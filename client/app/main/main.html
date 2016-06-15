@@ -1,11 +1,17 @@
 <div class="container-fluid">
   <div class="row-fluid">
-    <Tree class="tree col-md-2" notes="main.notes"
+    <Tree class="tree col-md-2" notes="main.displayedNotes"
           on-select="main.handleNoteSelection(note)"
           on-create="main.handleNoteCreate()"
           on-delete="main.handleNoteDelete(note)">
     </Tree>
-    <Editor class="editor col-xs-12 col-sm-12 col-md-5" note="main.note.content" on-submit="main.submitNote(note)"></Editor>
+    <Editor class="editor col-xs-12 col-sm-12 col-md-5"
+            note="main.note.content"
+            on-submit="main.submitNote(note)"
+            on-change="main.handleContentChange(content)"
+            on-title-change="main.handleTitleChange(title)"
+            on-tags-change="main.handleTagsChange(tags)">
+    </Editor>
     <Preview class="preview col-md-5" note="main.note.content"></Preview>
   </div>
 </div>

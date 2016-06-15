@@ -1,12 +1,10 @@
 'use strict';
 
 export default class PreviewController {
-  constructor(marked) {
+  constructor($scope, marked) {
     'ngInject';
-    this.marked = marked;
-  }
-
-  markdown() {
-    return this.marked(this.note);
+    $scope.$watch(
+        () => this.note,
+        note => { if (note) this.markdown = marked(note) });
   }
 }

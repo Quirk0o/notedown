@@ -8,18 +8,18 @@
     <span aria-hidden="true">&times;</span>
   </button>
   <ul class="nav nav-pills nav-stacked" ui-tree-nodes="" ng-model="node.nodes">
-    <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'node_renderer.html'">
+    <li ng-repeat="node in node.nodes track by node._id" ui-tree-node ng-include="'node_renderer.html'">
     </li>
   </ul>
 </script>
 
-<section ui-tree>
+<section ui-tree data-empty-placeholder-enabled="false">
   <ul class="nav nav-pills nav-stacked"
       ui-tree-nodes=""
       data-drag-delay="100"
       ng-model="$ctrl.nodes"
       id="tree-root">
-    <li ng-click="$ctrl.onSelect({note: node})" ng-repeat="node in $ctrl.nodes" ui-tree-node role="presentation">
+    <li ng-click="$ctrl.onSelect({note: node})" ng-repeat="node in $ctrl.nodes track by node._id" ui-tree-node role="presentation">
       <a href="#" ng-include="'node_renderer.html'"></a>
     </li>
   </ul>

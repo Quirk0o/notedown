@@ -8,7 +8,10 @@ export default {
   template: require('./editor.html'),
   controller: EditorController,
   bindings: {
-    note: '=',
+    note: '<',
+    onChange: '&',
+    onTitleChange: '&',
+    onTagsChange: '&',
     onSubmit: '&'
   }
 };

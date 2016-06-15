@@ -6,38 +6,44 @@ const tagRegex = /(?:\s|^)(?:#)(\w*[A-Za-z_]+\w*)/gi;
 
 export default class EditorController {
 
-  constructor(marked, $sanitize) {
+  constructor($scope, marked, $sanitize) {
     'ngInject';
+    this.note = this.note || '';
     this.marked = marked;
     this.$sanitize = $sanitize;
+
+    $scope.$watch(
+        () => this.getNoteTitle(this.note),
+        (title => this.onTitleChange({ title })));
+    $scope.$watch(
+        () => this.getNoteTags(this.note),
+        tags => this.onTagsChange({ tags }),
+        true);
+    $scope.$watch(
+        () => this.note, 
+        content => this.onChange({ content }));
+
   }
 
-  _getNoteTitle(content) {
-    let html = this.$sanitize(this.marked(content));
-    let title = $(html).filter('h1').first();
-    if (!title) {
-      return 'Untitled';
+  getNoteTitle(content) {
+    if (content) {
+      let html = this.$sanitize(this.marked(content));
+      let title = $(html).filter('h1').first();
+
+      if (!title) {
+        return 'Untitled';
+      }
+      return title.text();
     }
-    return title.text();
   }
 
-  _getNoteTags(content) {
+  getNoteTags(content) {
     let result, tags = [];
     while ((result = tagRegex.exec(content))) {
       tags.push(result[0]);
     }
 
     return tags;
-  }
-
-  submitNote(content) {
-    this.onSubmit({
-      note: {
-        content,
-        title: this._getNoteTitle(content),
-        tags: this._getNoteTags(content)
-      }
-    });
   }
 
   aceLoaded(editor) {

@@ -31,7 +31,6 @@ export function setup(User, config) {
     passwordField: 'password', // this is the virtual field on the model,
     passReqToCallback: true
   }, function(req, email, password, done) {
-    req.session.accessToken = 'bob';
     return localAuthenticate(User, email, password, done);
   }));
 }
