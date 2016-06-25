@@ -1,19 +1,21 @@
 <script type="text/ng-template" id="node_renderer.html">
     <i ui-tree-handle="" class="fa fa-arrows-v text-muted" aria-hidden="true"></i>
-    <span ng-if="node.nodes.length > 0" class="caret" aria-label="Expand"></span>
-    <span>
-    {{node.title ? node.title : 'Untitled Note'}}
-  </span>
-    <button ng-click="$ctrl.onCreate({parent: node})" type="button" class="add pull-right" aria-label="Add">
+    <span ng-if="node.hasChildren"
+          ng-class="{'caret-right': node.collapsed, caret: !node.collapsed}"
+          aria-hidden="true"></span>
+    <span ng-click="$ctrl.onClick(node)">
+        {{node.title ? node.title : 'Untitled Note'}}
+    </span>
+    <button ng-if="!node.parent"
+            ng-click="$ctrl.onCreate({parent: node})"
+            type="button"
+            class="add pull-right"
+            aria-label="Add">
         <i class="fa fa-plus fa-2" aria-hidden="true"></i>
     </button>
     <button ng-click="$ctrl.onDelete({note: node})" type="button" class="close pull-right" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
-    <ul class="nav nav-pills nav-stacked" ui-tree-nodes="" ng-model="node.nodes">
-        <li ng-repeat="node in node.nodes track by node._id" ui-tree-node ng-include="'node_renderer.html'">
-        </li>
-    </ul>
 </script>
 
 <section ui-tree data-empty-placeholder-enabled="false">
@@ -22,12 +24,24 @@
         data-drag-delay="100"
         ng-model="$ctrl.nodes"
         id="tree-root">
-        <li ng-click="$ctrl.onSelect({note: node})"
-            ng-repeat="node in $ctrl.nodes track by node._id"
-            ui-tree-node
-            role="presentation">
-            <a href="#" ng-include="'node_renderer.html'"></a>
-        </li>
+        <div ng-repeat="node in $ctrl.nodes track by node._id">
+            <li ui-tree-node
+                ng-class="{active: node._id === $ctrl.activeNote._id}"
+                role="presentation">
+                <a href="#" ng-include="'node_renderer.html'"></a>
+            </li>
+            <ul class="nav nav-pills nav-stacked collapse"
+                ui-tree-nodes=""
+                ng-model="node.children"
+                ng-if="node.hasChildren"
+                uib-collapse="node.collapsed">
+                <li ng-repeat="node in node.children track by node._id"
+                    ui-tree-node
+                    ng-class="{active: node._id === $ctrl.activeNote._id}">
+                    <a href="#" ng-include="'node_renderer.html'"></a>
+                </li>
+            </ul>
+        </div>
     </ul>
 </section>
 

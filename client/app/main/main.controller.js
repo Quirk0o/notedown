@@ -1,5 +1,7 @@
 'use strict';
 
+import angular from 'angular'
+
 export default class MainController {
   constructor($scope, $timeout, Auth, socket, Note, Drive) {
     'ngInject';
@@ -7,17 +9,23 @@ export default class MainController {
     this.Auth = Auth;
     this.Note = Note;
     this.Drive = Drive;
+    let notes = [];
     this.notes = [];
     this.displayedNotes = [];
 
     Note.query().$promise
         .then(data => {
-          this.notes = data;
-          if (data.length > 0) {
-            this.note = data[data.length - 1];
-          }
-          socket.syncUpdates('note', this.notes);
+          notes = data;
+          socket.syncUpdates('note', notes)
         });
+
+    $scope.$watch(
+        () => notes,
+        notes => {
+          this.notes = notes.filter(note => !note.parent);
+        },
+        true
+    );
 
     $scope.$on('$destroy', function () {
       socket.unsyncUpdates('note');
@@ -26,18 +34,14 @@ export default class MainController {
     $scope.$watch(
         () => this.note,
         this.debounceSave.bind(this),
-        true);
+        true
+    );
 
     $scope.$watch(
-        () => {
-          if (this.note) {
-            return this.note._id ? this.notes : this.notes.concat([this.note]);
-          } else {
-            return this.notes;
-          }
-        },
-        notes => this.displayedNotes = notes,
-        true);
+        () => this.notes,
+        notes => this.displayedNotes = angular.copy(notes),
+        true
+    );
   }
 
   saveNote(note) {
@@ -57,8 +61,8 @@ export default class MainController {
     }
   }
 
-  debounceSave(value) {
-    if (value) {
+  debounceSave(newValue, oldValue) {
+    if (!angular.equals(newValue, oldValue)) {
       if (this.timeout) {
         this.$timeout.cancel(this.timeout);
       }
@@ -66,7 +70,7 @@ export default class MainController {
         this.saveNote(value)
             .then(data => {
               this.note = data;
-              if (!this.notes.find(elem =>  elem._id === data._id)) {
+              if (!this.notes.find(elem => elem._id === data._id)) {
                 this.notes.push(data);
               }
             })
@@ -80,11 +84,24 @@ export default class MainController {
       if (this.note) {
         this.saveNote(this.note)
             .then(() => {
-              this.note = this.notes.find(elem => elem._id === note._id);
+              if (note.parent) {
+                return this.Note.get({ id: note._id }).$promise;
+              }
+              else {
+                return this.notes.find(elem => elem._id === note._id);
+              }
             })
-            .catch(() => console.log('Failed to save note - aborting'));
+            .then(note => this.note = note)
+            .catch(err => console.log('Failed to save note - aborting', err));
       } else {
-        this.note = this.notes.find(elem => elem._id === note._id);
+        let list = this.notes.slice();
+        for (let i = 0; i < list.length; i++) {
+          if (list[i]._id == note._id) {
+            this.note = list[i];
+            return;
+          }
+          list[i].children.forEach(child => list.push(this.Note.get({ id: child })));
+        }
       }
     }
   }
@@ -95,27 +112,37 @@ export default class MainController {
     }
 
     if (note._id) {
-      let oldNotes = this.notes;
-      this.notes = oldNotes.filter(elem => elem !== note);
+      let oldNotes = angular.copy(this.notes);
 
-      this.Note.delete({ id: note._id }).$promise
-          .catch(() => this.notes = oldNotes);
-    } else {
-      this.notes = this.notes.filter(elem => elem !== note);
-    }
+      if (note.parent) {
+        let parent = this.notes.find(elem => elem._id === note.parent);
+        parent.children
+            .filter(child => child._id !== note._id);
+        console.log(parent);
 
-    if (this.notes.length > 0) {
-      this.note = this.notes[this.notes.length - 1];
+        this.Note.update({ id: parent._id }, parent).$promise
+            .then(() => {
+              return this.Note.delete({ id: note._id }).$promise;
+            })
+            .catch(() => this.notes = oldNotes);
+      } else {
+        this.notes = this.notes.filter(elem => elem._id !== note._id);
+
+        console.log(this.notes);
+
+        this.Note.delete({ id: note._id }).$promise
+            .catch(() => this.notes = oldNotes);
+      }
     }
   }
 
-  handleNoteCreate() {
+  handleNoteCreate(parent) {
     if (this.note) {
       this.saveNote(this.note)
-          .then(() => this.note = { content: '', title: '', tags: [] })
-          .catch(() => console.log('Failed to save note - aborting'));
+          .then(() => this.note = { content: '', title: '', tags: [], parent: parent ? parent._id : null })
+          .catch(() => console.log('Failed to save note - aborting', err));
     } else {
-      this.note = { content: '', title: '', tags: [] };
+      this.note = { content: '', title: '', tags: [], parent: parent ? parent._id : null };
     }
   }
 
@@ -135,5 +162,34 @@ export default class MainController {
     if (this.note) {
       this.note.tags = value;
     }
+  }
+
+  handleNoteExpand(note) {
+    note = this.notes.find(elem => elem._id === note._id);
+    if (note.children.length > 0 && !note.children[0].title) {
+      note.children = note.children.map(id => this.Note.get({ id }));
+    }
+  }
+
+  handleNoteCollapse(note) {
+
+  }
+
+  handleSearch(value) {
+    let list = this.notes.slice();
+    this.notes = [];
+    list.forEach(note => {
+      if (note.tags.includes(value)) {
+        this.notes.push(note);
+      }
+      note.children.forEach(child => list.push(this.Note.get({ id: child })));
+    });
+  }
+
+  handleShowAll() {
+    this.Note.query().$promise
+        .then(data => {
+          this.notes = data;
+        });
   }
 }

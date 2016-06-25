@@ -3,6 +3,7 @@
 export default function NoteResource($resource) {
   'ngInject';
   return $resource('/api/notes/:id', null, {
-    'update': { method:'PUT' }
+    'update': { method: 'PUT' },
+    'create': { method: 'POST' }
   });
 }

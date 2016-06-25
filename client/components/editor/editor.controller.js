@@ -40,7 +40,7 @@ export default class EditorController {
   getNoteTags(content) {
     let result, tags = [];
     while ((result = tagRegex.exec(content))) {
-      tags.push(result[0]);
+      tags.push(result[1]);
     }
 
     return tags;

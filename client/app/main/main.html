@@ -1,17 +1,24 @@
+<navbar on-search="main.handleSearch(value)"
+        on-show-all="main.handleShowAll()"></navbar>
+
 <div class="container-fluid">
-  <div class="row-fluid">
-    <Tree class="tree col-md-2" notes="main.displayedNotes"
-          on-select="main.handleNoteSelection(note)"
-          on-create="main.handleNoteCreate()"
-          on-delete="main.handleNoteDelete(note)">
-    </Tree>
-    <Editor class="editor col-xs-12 col-sm-12 col-md-5"
-            note="main.note.content"
-            on-submit="main.submitNote(note)"
-            on-change="main.handleContentChange(content)"
-            on-title-change="main.handleTitleChange(title)"
-            on-tags-change="main.handleTagsChange(tags)">
-    </Editor>
-    <Preview class="preview col-md-5" note="main.note.content"></Preview>
-  </div>
+    <div class="row-fluid">
+        <Tree class="tree col-md-2"
+              notes="main.displayedNotes"
+              active-note="main.note"
+              on-select="main.handleNoteSelection(note)"
+              on-expand="main.handleNoteExpand(note)"
+              on-collapse="main.handleNoteCollapse(note)"
+              on-create="main.handleNoteCreate(parent)"
+              on-delete="main.handleNoteDelete(note)">
+        </Tree>
+        <Editor class="editor col-xs-12 col-sm-12 col-md-5"
+                note="main.note.content"
+                on-submit="main.submitNote(note)"
+                on-change="main.handleContentChange(content)"
+                on-title-change="main.handleTitleChange(title)"
+                on-tags-change="main.handleTagsChange(tags)">
+        </Editor>
+        <Preview class="preview col-md-5" note="main.note.content"></Preview>
+    </div>
 </div>
