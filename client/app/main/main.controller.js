@@ -9,23 +9,21 @@ export default class MainController {
     this.Auth = Auth;
     this.Note = Note;
     this.Drive = Drive;
-    let notes = [];
     this.notes = [];
     this.displayedNotes = [];
+    this.dirty = false;
 
-    Note.query().$promise
-        .then(data => {
-          notes = data;
-          socket.syncUpdates('note', notes)
+    this._fetchNotes()
+        .then(() => {
+          socket.syncUpdates('note', this.notes, (event, item) => {
+            if (event === 'created' || event === 'updated') {
+              this._populateChildren(item);
+            }
+            if (item._id === this.note._id) {
+              this.note = item;
+            }
+          });
         });
-
-    $scope.$watch(
-        () => notes,
-        notes => {
-          this.notes = notes.filter(note => !note.parent);
-        },
-        true
-    );
 
     $scope.$on('$destroy', function () {
       socket.unsyncUpdates('note');
@@ -33,31 +31,64 @@ export default class MainController {
 
     $scope.$watch(
         () => this.note,
-        this.debounceSave.bind(this),
+        (newVal, oldVal) => {
+          this.dirty = true;
+          this.debounceSave.bind(newVal, oldVal);
+        },
         true
     );
 
     $scope.$watch(
-        () => this.notes,
-        notes => this.displayedNotes = angular.copy(notes),
+        () => this.note,
+        () => this.dirty = false,
+        false
+    );
+
+    $scope.$watch(
+        () => this.notes.filter(elem => !elem.parent),
+        notes => this.displayedNotes = notes,
         true
     );
+  }
+
+  _fetchNotes() {
+    return this.Note.query().$promise
+        .then(data => {
+          this.notes = data;
+          this.notes.forEach(note => this._populateChildren(note));
+          return data;
+        });
+  }
+
+  _populateChildren(note) {
+    note.children = note.children.map(childId => this.notes.find(elem => elem._id === childId));
+  }
+
+  _restoreNote(note) {
+    let newNote = angular.copy(note);
+    newNote.children = newNote.children.map(child => child._id);
+    return newNote;
+  }
+
+  _findParent(note) {
+    return this.notes.find(elem => elem._id === note.parent);
   }
 
   saveNote(note) {
     this.$timeout.cancel(this.timeout);
 
-    note.author = this.Auth.getCurrentUser()._id;
+    if (this.dirty) {
+      //this.Drive.save(note).$promise
+      //    .then(() => console.log('Saved to drive'))
+      //    .catch((err) => console.log('Failed to save to drive', err));
 
-    if (note._id) {
-      return this.Note.update({ id: note._id }, note).$promise;
+      return this.Note.update({ id: note._id }, this._restoreNote(note)).$promise
+          .then(note => {
+            this.dirty = false;
+            return note;
+          });
     } else {
-
-      this.Drive.save(note).$promise
-          .then(() => console.log('Saved to drive'))
-          .catch((err) => console.log('Failed to save to drive', err));
-
-      return this.Note.save(note).$promise;
+      return Promise.resolve();
     }
   }
 
@@ -67,82 +98,74 @@ export default class MainController {
         this.$timeout.cancel(this.timeout);
       }
       this.timeout = this.$timeout(() => {
-        this.saveNote(value)
+        this.saveNote(newValue)
             .then(data => {
               this.note = data;
               if (!this.notes.find(elem => elem._id === data._id)) {
                 this.notes.push(data);
               }
             })
-            .catch(() => this.debounceSave(value));
+            .catch(() => this.debounceSave(newValue));
       }, 5000);  // 1000 = 1 second
     }
   }
 
   handleNoteSelection(note) {
-    if (note._id) {
-      if (this.note) {
-        this.saveNote(this.note)
-            .then(() => {
-              if (note.parent) {
-                return this.Note.get({ id: note._id }).$promise;
-              }
-              else {
-                return this.notes.find(elem => elem._id === note._id);
-              }
-            })
-            .then(note => this.note = note)
-            .catch(err => console.log('Failed to save note - aborting', err));
-      } else {
-        let list = this.notes.slice();
-        for (let i = 0; i < list.length; i++) {
-          if (list[i]._id == note._id) {
-            this.note = list[i];
-            return;
-          }
-          list[i].children.forEach(child => list.push(this.Note.get({ id: child })));
-        }
-      }
+    if (this.note) {
+      this.saveNote(this.note)
+          .then(() => this.notes.find(elem => elem._id === note._id))
+          .then(note => this.note = note)
+          .catch(err => console.log('Failed to save note - aborting', err));
+    } else {
+      this.note = this.notes.find(elem => elem._id === note._id);
     }
   }
 
   handleNoteDelete(note) {
-    if (this.note === note) {
-      this.note = null;
+    let oldNotes = angular.copy(this.notes);
+    this.notes = this.notes.filter(elem => elem._id !== note._id);
+
+    if (note.parent) {
+      let parent = this._findParent(note);
+      parent.children = parent.children.filter(child => child._id !== note._id);
+
+      this.Note.update({ id: parent._id }, this._restoreNote(note.parent)).$promise
+          .then(() => this.Note.delete({ id: note._id }).$promise)
+          .catch(() => this.notes = oldNotes);
+    } else {
+      this.Note.delete({ id: note._id }).$promise
+          .catch(() => this.notes = oldNotes);
     }
+  }
 
-    if (note._id) {
-      let oldNotes = angular.copy(this.notes);
-
-      if (note.parent) {
-        let parent = this.notes.find(elem => elem._id === note.parent);
-        parent.children
-            .filter(child => child._id !== note._id);
-        console.log(parent);
-
-        this.Note.update({ id: parent._id }, parent).$promise
-            .then(() => {
-              return this.Note.delete({ id: note._id }).$promise;
+  _createNote(parent) {
+    let note;
+    if (parent) {
+      return new Promise((resolve, reject) => {
+        this.Note.create({ author: this.Auth.getCurrentUser()._id, parent: parent._id }).$promise
+            .then(data => {
+              parent.children.push(data);
+              note = data;
+              return this.Note.update({ id: parent._id }, this._restoreNote(parent)).$promise;
             })
-            .catch(() => this.notes = oldNotes);
-      } else {
-        this.notes = this.notes.filter(elem => elem._id !== note._id);
-
-        console.log(this.notes);
-
-        this.Note.delete({ id: note._id }).$promise
-            .catch(() => this.notes = oldNotes);
-      }
+            .then(() => resolve(note))
+            .catch(err => reject(err));
+      });
+    } else {
+      return this.Note.create({ author: this.Auth.getCurrentUser()._id }).$promise;
     }
   }
 
   handleNoteCreate(parent) {
     if (this.note) {
       this.saveNote(this.note)
-          .then(() => this.note = { content: '', title: '', tags: [], parent: parent ? parent._id : null })
-          .catch(() => console.log('Failed to save note - aborting', err));
+          .then(() => this._createNote(parent))
+          .then(note => this.note = this.notes.find(elem => elem._id === note._id) || note)
+          .catch(err => console.log('Failed to create note', err));
     } else {
-      this.note = { content: '', title: '', tags: [], parent: parent ? parent._id : null };
+      this._createNote(parent)
+          .then(note => this.note = this.notes.find(elem => elem._id === note._id) || note)
+          .catch(err => console.log('Failed to create note', err));
     }
   }
 
@@ -164,32 +187,19 @@ export default class MainController {
     }
   }
 
-  handleNoteExpand(note) {
-    note = this.notes.find(elem => elem._id === note._id);
-    if (note.children.length > 0 && !note.children[0].title) {
-      note.children = note.children.map(id => this.Note.get({ id }));
-    }
-  }
-
-  handleNoteCollapse(note) {
-
-  }
-
   handleSearch(value) {
     let list = this.notes.slice();
     this.notes = [];
     list.forEach(note => {
       if (note.tags.includes(value)) {
         this.notes.push(note);
+        note.collapsed = true;
+        note.children = [];
       }
-      note.children.forEach(child => list.push(this.Note.get({ id: child })));
     });
   }
 
   handleShowAll() {
-    this.Note.query().$promise
-        .then(data => {
-          this.notes = data;
-        });
+    this._fetchNotes();
   }
 }

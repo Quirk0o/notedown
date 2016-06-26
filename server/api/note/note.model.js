@@ -12,7 +12,8 @@ const NoteSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
   active:    { type: Boolean, default: true },
   children:  [Schema.Types.ObjectId],
-  parent:    Schema.Types.ObjectId
+  parent:    Schema.Types.ObjectId,
+  collapsed: Boolean
 });
 
 export default mongoose.model('Note', NoteSchema);

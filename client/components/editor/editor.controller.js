@@ -50,6 +50,7 @@ export default class EditorController {
     let session = editor.getSession();
     let renderer = editor.renderer;
     editor.setTheme('chrome');
+    editor.$blockScrolling = Infinity;
 
     session.setUseWrapMode(true);
     session.setMode('markdown');

@@ -41,72 +41,51 @@ Thing.find({}).removeAsync()
     });
 
 User.find({}).removeAsync()
+    .then(() => User.createAsync({
+      provider: 'local',
+      name:     'Test User',
+      email:    'test@example.com',
+      password: 'test'
+    }, {
+      provider: 'local',
+      role:     'admin',
+      name:     'Admin',
+      email:    'admin@example.com',
+      password: 'admin'
+    }))
     .then(() => {
-      User.createAsync({
-            provider: 'local',
-            name:     'Test User',
-            email:    'test@example.com',
-            password: 'test'
-          }, {
-            provider: 'local',
-            role:     'admin',
-            name:     'Admin',
-            email:    'admin@example.com',
-            password: 'admin'
-          })
-          .then(() => {
-            console.log('finished populating users');
+      console.log('finished populating users');
+      return User.findOneAsync({ name: 'Test User' })
+    })
+    .then(user => {
+      Note.removeAsync()
+          .then(() => Note.createAsync({
+            title:   'title',
+            content: '# title\ncontent\n#tag',
+            tags:    ['tag'],
+            author:  user._id
+          }))
+          .then(parent => {
+            var child = new Note({
+              title:   'child title',
+              content: '# child title\nchild content',
+              author:  user._id,
+              parent:  parent._id
+            });
 
-            User.findOneAsync({ name: 'Test User' })
-                .then(user => {
-                  Note.removeAsync()
-                      .then(() => {
+            child.saveAsync()
+                .then(() => {
+                  parent.children.push(child._id);
+                  parent.saveAsync();
 
-                        var parent = new Note({
-                          title:   'title',
-                          content: '# title\ncontent\n#tag',
-                          tags: ['tag'],
-                          author:  user._id
-                        });
-
-                        parent.saveAsync()
-                            .then(() => {
-                              var child = new Note({
-                                title:   'child title',
-                                content: 'child content',
-                                author:  user._id,
-                                parent:  parent._id
-                              });
-
-                              child.saveAsync()
-                                  .then(() => {
-                                    parent.children.push(child._id);
-                                    parent.saveAsync();
-
-                                    var child2 = new Note({
-                                      title:   'child child title',
-                                      content: 'child child content',
-                                      author:  user._id,
-                                      parent:  child._id
-                                    });
-
-                                    child2.saveAsync()
-                                        .then(() => {
-                                          child.children.push(child2._id);
-                                          child.saveAsync()
-                                              .then(() => {
-                                                Note.createAsync({
-                                                  title:   'another title',
-                                                  content: '# another title\nmore content',
-                                                  author:  user._id
-                                                }).then(() =>
-                                                    console.log('finished populating notes')
-                                                )
-                                              });
-                                        });
-                                  });
-                            });
-                      });
+                  return Note.createAsync({
+                    title:   'another title',
+                    content: '# another title\nmore content',
+                    author:  user._id
+                  });
                 })
+                .then(() =>
+                    console.log('finished populating notes')
+                )
           });
     });

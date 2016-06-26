@@ -10,8 +10,6 @@ export default {
     notes:      '<',
     activeNote: '<',
     onSelect:   '&',
-    onExpand:   '&',
-    onCollapse: '&',
     onChange:   '&',
     onDelete:   '&',
     onCreate:   '&'

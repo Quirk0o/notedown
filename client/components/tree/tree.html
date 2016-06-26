@@ -1,13 +1,13 @@
 <script type="text/ng-template" id="node_renderer.html">
     <i ui-tree-handle="" class="fa fa-arrows-v text-muted" aria-hidden="true"></i>
-    <span ng-if="node.hasChildren"
+    <span ng-if="node.children.length > 0"
           ng-class="{'caret-right': node.collapsed, caret: !node.collapsed}"
           aria-hidden="true"></span>
-    <span ng-click="$ctrl.onClick(node)">
+    <span ng-click="$ctrl.handleClick(node)">
         {{node.title ? node.title : 'Untitled Note'}}
     </span>
     <button ng-if="!node.parent"
-            ng-click="$ctrl.onCreate({parent: node})"
+            ng-click="$ctrl.handleCreate(node)"
             type="button"
             class="add pull-right"
             aria-label="Add">
@@ -33,7 +33,6 @@
             <ul class="nav nav-pills nav-stacked collapse"
                 ui-tree-nodes=""
                 ng-model="node.children"
-                ng-if="node.hasChildren"
                 uib-collapse="node.collapsed">
                 <li ng-repeat="node in node.children track by node._id"
                     ui-tree-node
