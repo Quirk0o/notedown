@@ -15,6 +15,7 @@ const NoteSchema = new Schema({
   parent:    Schema.Types.ObjectId,
   collapsed: { type: Boolean, default: true },
   seq:       { type: Number, default: 0 },
+  fileId:    String
 });
 
 export default mongoose.model('Note', NoteSchema);

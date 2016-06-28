@@ -78,9 +78,6 @@ export default class MainController {
     this.$timeout.cancel(this.timeout);
 
     if (this.dirty) {
-      //this.Drive.save(note).$promise
-      //    .then(() => console.log('Saved to drive'))
-      //    .catch((err) => console.log('Failed to save to drive', err));
 
       return this.Note.update({ id: note._id }, this._restoreNote(note)).$promise
           .then(note => {
@@ -103,6 +100,10 @@ export default class MainController {
               this.note = data;
               if (!this.notes.find(elem => elem._id === data._id)) {
                 this.notes.push(data);
+              }
+
+              if (data.fileId) {
+                return this.Drive.update({ id: data.fileId }).$promise;
               }
             })
             .catch(() => this.debounceSave(newValue));
@@ -140,20 +141,27 @@ export default class MainController {
 
   _createNote(parent) {
     let note;
-    if (parent) {
-      return new Promise((resolve, reject) => {
-        this.Note.create({ author: this.Auth.getCurrentUser()._id, parent: parent._id }).$promise
-            .then(data => {
+    return new Promise((resolve, reject) => {
+      this.Note.create({ author: this.Auth.getCurrentUser()._id, parent: parent ? parent._id : null }).$promise
+          .then(data => {
+            note = data;
+            if (parent) {
               parent.children.push(data);
-              note = data;
               return this.Note.update({ id: parent._id }, this._restoreNote(parent)).$promise;
-            })
-            .then(() => resolve(note))
-            .catch(err => reject(err));
-      });
-    } else {
-      return this.Note.create({ author: this.Auth.getCurrentUser()._id }).$promise;
-    }
+            }
+            return Promise.resolve();
+          })
+          .then(() => this.Drive.save(note).$promise)
+          .then(response => {
+            if (response.fileId) {
+              note.fileId = response.fileId;
+              return this.Note.update({ id: note._id }, note).$promise;
+            }
+            return Promise.resolve();
+          })
+          .then(() => resolve(note))
+          .catch(err => reject(err));
+    });
   }
 
   handleNoteCreate(parent) {

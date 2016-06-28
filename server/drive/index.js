@@ -7,5 +7,6 @@ import * as auth from '../auth/auth.service'
 let router = new Router();
 
 router.post('/', auth.isAuthenticated(), drive.upload);
+router.put('/', auth.isAuthenticated(), drive.update);
 
 export default router;
