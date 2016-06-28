@@ -62,7 +62,9 @@ function handleError(res, statusCode) {
 // Gets a list of Notes
 export function index(req, res) {
   let user = req.user;
-  Note.findAsync({ author: user._id })
+  Note.find({ author: user._id })
+      .sort('seq')
+      .execAsync()
       .then(respondWithResult(res))
       .catch(handleError(res));
 }

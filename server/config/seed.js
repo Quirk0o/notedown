@@ -63,7 +63,8 @@ User.find({}).removeAsync()
             title:   'title',
             content: '# title\ncontent\n#tag',
             tags:    ['tag'],
-            author:  user._id
+            author:  user._id,
+            index:   1
           }))
           .then(parent => {
             var child = new Note({
@@ -81,7 +82,8 @@ User.find({}).removeAsync()
                   return Note.createAsync({
                     title:   'another title',
                     content: '# another title\nmore content',
-                    author:  user._id
+                    author:  user._id,
+                    index:   0
                   });
                 })
                 .then(() =>

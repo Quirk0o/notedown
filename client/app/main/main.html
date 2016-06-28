@@ -8,7 +8,8 @@
               active-note="main.note"
               on-select="main.handleNoteSelection(note)"
               on-create="main.handleNoteCreate(parent)"
-              on-delete="main.handleNoteDelete(note)">
+              on-delete="main.handleNoteDelete(note)"
+              on-change="main.handleChange(notes)">
         </Tree>
         <Editor class="editor col-xs-12 col-sm-12 col-md-5"
                 note="main.note.content"

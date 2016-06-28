@@ -19,7 +19,7 @@ export default class MainController {
             if (event === 'created' || event === 'updated') {
               this._populateChildren(item);
             }
-            if (item._id === this.note._id) {
+            if (this.note && item._id === this.note._id) {
               this.note = item;
             }
           });
@@ -45,7 +45,7 @@ export default class MainController {
     );
 
     $scope.$watch(
-        () => this.notes.filter(elem => !elem.parent),
+        () => this.notes.filter(elem => !elem.parent).sort((a, b) => a.seq - b.seq),
         notes => this.displayedNotes = notes,
         true
     );
@@ -201,5 +201,11 @@ export default class MainController {
 
   handleShowAll() {
     this._fetchNotes();
+  }
+
+  handleChange(notes) {
+    notes.forEach(note => {
+      this.Note.update({ id: note._id }, this._restoreNote(note));
+    });
   }
 }

@@ -4,16 +4,17 @@ const mongoose = require('bluebird').promisifyAll(require('mongoose')),
     Schema = mongoose.Schema;
 
 const NoteSchema = new Schema({
-  title:     String,
-  author:    Schema.Types.ObjectId,
-  content:   String,
+  title:     { type: String, default: '' },
+  author:    { type: Schema.Types.ObjectId, required: true },
+  content:   { type: String, default: '' },
   tags:      [String],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   active:    { type: Boolean, default: true },
   children:  [Schema.Types.ObjectId],
   parent:    Schema.Types.ObjectId,
-  collapsed: Boolean
+  collapsed: { type: Boolean, default: true },
+  seq:       { type: Number, default: 0 },
 });
 
 export default mongoose.model('Note', NoteSchema);
