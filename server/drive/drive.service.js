@@ -69,6 +69,7 @@ export function update(req, res) {
     }, (err, response) => {
       if (err) {
         let statusCode = err.status || 500;
+        console.log(err);
         res.status(statusCode).send(err);
       } else {
         let statusCode = response.status || 200;

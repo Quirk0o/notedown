@@ -78,11 +78,17 @@ export default class MainController {
     this.$timeout.cancel(this.timeout);
 
     if (this.dirty) {
-
+      let newNote;
       return this.Note.update({ id: note._id }, this._restoreNote(note)).$promise
           .then(note => {
+            newNote = note;
+            if (note.fileId) {
+              return this.Drive.update({ id: note.fileId }, note).$promise;
+            }
+          })
+          .then(() => {
             this.dirty = false;
-            return note;
+            return newNote;
           });
     } else {
       return Promise.resolve();
@@ -100,10 +106,6 @@ export default class MainController {
               this.note = data;
               if (!this.notes.find(elem => elem._id === data._id)) {
                 this.notes.push(data);
-              }
-
-              if (data.fileId) {
-                return this.Drive.update({ id: data.fileId }).$promise;
               }
             })
             .catch(() => this.debounceSave(newValue));
@@ -153,8 +155,8 @@ export default class MainController {
           })
           .then(() => this.Drive.save(note).$promise)
           .then(response => {
-            if (response.fileId) {
-              note.fileId = response.fileId;
+            if (response.id) {
+              note.fileId = response.id;
               return this.Note.update({ id: note._id }, note).$promise;
             }
             return Promise.resolve();
